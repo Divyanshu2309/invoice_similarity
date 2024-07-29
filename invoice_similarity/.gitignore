@@ -1,0 +1,9 @@
+# Ignore PDF files
+*.pdf
+
+# Ignore virtual environment directories
+venv/
+
+# Ignore other temporary files
+*.pyc
+__pycache__/
