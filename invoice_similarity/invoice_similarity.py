@@ -1,3 +1,10 @@
+"""
+python3 -m venv venv
+source venv/bin/activate
+chmod +x venv/bin/activate
+pip3 install pymupdf nltk scikit-learn
+"""
+
 import ssl
 import nltk
 import fitz  # PyMuPDF
@@ -120,7 +127,7 @@ def main(input_pdf_path, database_pdfs):
 
 # Usage example
 if __name__ == "__main__":
-    input_pdf = '/Users/divyanshuagarwal/Desktop/invoice similarity/invoice_similarity/test/invoice_77098.pdf'
+    input_pdf = '/Users/divyanshuagarwal/Desktop/invoice similarity/invoice_similarity/test/invoice_102857.pdf'
     database_pdfs = [
         '/Users/divyanshuagarwal/Desktop/invoice similarity/invoice_similarity/2024.03.15_1145.pdf',
         '/Users/divyanshuagarwal/Desktop/invoice similarity/invoice_similarity/Faller_8.PDF',
