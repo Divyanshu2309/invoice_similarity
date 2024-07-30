@@ -90,6 +90,7 @@ def main(input_pdf_path, database_pdfs):
     input_text = preprocess_text(extract_text_from_pdf(input_pdf_path))
     input_features = extract_features(input_text)
     
+    #created two list
     similarity_scores = []
     structural_scores = []
     
