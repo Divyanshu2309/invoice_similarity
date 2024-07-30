@@ -1,5 +1,11 @@
 import ssl
 import nltk
+import fitz  # PyMuPDF
+import re
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 # Workaround to handle SSL certificate verification issues
 try:
@@ -12,14 +18,6 @@ else:
 # Download necessary NLTK data
 nltk.download('stopwords')
 nltk.download('punkt')
-
-import fitz  # PyMuPDF
-import re
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
-import numpy as np
 
 def extract_text_from_pdf(pdf_path):
     """
@@ -49,17 +47,37 @@ def preprocess_text(text):
     words = [word for word in words if word not in stopwords.words('english')]
     return ' '.join(words)
 
-def calculate_similarity(texts):
+def extract_features(text):
     """
-    Calculate similarity scores between documents using TF-IDF and Cosine Similarity.
+    Extract features like invoice number, date, and amount from the text.
     
-    :param texts: List of texts to compare.
-    :return: Similarity matrix.
+    :param text: Preprocessed text.
+    :return: Extracted features as a dictionary.
     """
-    vectorizer = TfidfVectorizer()
-    vectors = vectorizer.fit_transform(texts)
-    similarity_matrix = cosine_similarity(vectors)
-    return similarity_matrix
+    features = {
+        'invoice_number': re.findall(r'invoice\s*#?\s*(\d+)', text),
+        'date': re.findall(r'\b\d{1,2}[/.-]\d{1,2}[/.-]\d{2,4}\b', text),
+        'amount': re.findall(r'\b\d+\.\d{2}\b', text)
+    }
+    return features
+
+def calculate_structural_similarity(features1, features2):
+    """
+    Calculate structural similarity between two sets of features.
+    
+    :param features1: First set of features.
+    :param features2: Second set of features.
+    :return: Structural similarity score.
+    """
+    common_keys = set(features1.keys()).intersection(set(features2.keys()))
+    total_keys = set(features1.keys()).union(set(features2.keys()))
+    
+    score = 0
+    for key in common_keys:
+        if features1[key] == features2[key]:
+            score += 1
+            
+    return score / len(total_keys)
 
 def main(input_pdf_path, database_pdfs):
     """
@@ -70,18 +88,34 @@ def main(input_pdf_path, database_pdfs):
     :return: Most similar invoice and similarity score.
     """
     input_text = preprocess_text(extract_text_from_pdf(input_pdf_path))
-    database_texts = [preprocess_text(extract_text_from_pdf(pdf)) for pdf in database_pdfs]
+    input_features = extract_features(input_text)
     
-    all_texts = [input_text] + database_texts
-    similarity_matrix = calculate_similarity(all_texts)
+    similarity_scores = []
+    structural_scores = []
     
-    similarities = similarity_matrix[0, 1:]
-    most_similar_index = np.argmax(similarities)
+    for pdf in database_pdfs:
+        db_text = preprocess_text(extract_text_from_pdf(pdf))
+        db_features = extract_features(db_text)
+        
+        # Calculate text similarity
+        vectorizer = TfidfVectorizer()
+        tfidf_matrix = vectorizer.fit_transform([input_text, db_text])
+        text_similarity = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:2])[0][0]
+        
+        # Calculate structural similarity
+        structural_similarity = calculate_structural_similarity(input_features, db_features)
+        
+        combined_score = (text_similarity + structural_similarity) / 2
+        
+        similarity_scores.append(combined_score)
+        structural_scores.append(structural_similarity)
+    
+    most_similar_index = similarity_scores.index(max(similarity_scores))
     most_similar_invoice = database_pdfs[most_similar_index]
-    similarity_score = similarities[most_similar_index]
+    similarity_score = similarity_scores[most_similar_index]
+    structural_score = structural_scores[most_similar_index]
     
-    return most_similar_invoice, similarity_score
-
+    return most_similar_invoice, similarity_score, structural_score
 # Usage example
 input_pdf = '/Users/divyanshuagarwal/Desktop/invoice similarity/invoice_similarity/test/invoice_77098.pdf'
 database_pdfs = [
@@ -89,5 +123,5 @@ database_pdfs = [
     '/Users/divyanshuagarwal/Desktop/invoice similarity/invoice_similarity/Faller_8.PDF',
     '/Users/divyanshuagarwal/Desktop/invoice similarity/invoice_similarity/invoice_77073.pdf'
 ]
-most_similar_invoice, similarity_score = main(input_pdf, database_pdfs)
-print(f'The most similar invoice is: {most_similar_invoice} with a similarity score of {similarity_score}')
+most_similar_invoice, similarity_score, structural_score = main(input_pdf, database_pdfs)
+print(f'The most similar invoice is: {most_similar_invoice} with a similarity score of {similarity_score} and structural score of {structural_score}')
