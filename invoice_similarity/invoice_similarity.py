@@ -83,7 +83,7 @@ def main(input_pdf_path, database_pdfs):
     return most_similar_invoice, similarity_score
 
 # Usage example
-input_pdf = '/Users/divyanshuagarwal/Desktop/invoice similarity/invoice_similarity/test/invoice_102857.pdf'
+input_pdf = '/Users/divyanshuagarwal/Desktop/invoice similarity/invoice_similarity/test/invoice_77098.pdf'
 database_pdfs = [
     '/Users/divyanshuagarwal/Desktop/invoice similarity/invoice_similarity/2024.03.15_1145.pdf',
     '/Users/divyanshuagarwal/Desktop/invoice similarity/invoice_similarity/Faller_8.PDF',
