@@ -123,7 +123,8 @@ if __name__ == "__main__":
     database_pdfs = [
         '/Users/divyanshuagarwal/Desktop/invoice similarity/invoice_similarity/2024.03.15_1145.pdf',
         '/Users/divyanshuagarwal/Desktop/invoice similarity/invoice_similarity/Faller_8.PDF',
-        '/Users/divyanshuagarwal/Desktop/invoice similarity/invoice_similarity/invoice_77073.pdf'
+        '/Users/divyanshuagarwal/Desktop/invoice similarity/invoice_similarity/invoice_77073.pdf',
+        '/Users/divyanshuagarwal/Desktop/invoice similarity/invoice_similarity/invoice_102856.pdf'
     ]
     most_similar_invoice, similarity_score, structural_score = main(input_pdf, database_pdfs)
     print(f'The most similar invoice is: {most_similar_invoice} with a similarity score of {similarity_score} and structural score of {structural_score}')
