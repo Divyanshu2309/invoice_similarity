@@ -19,11 +19,23 @@ Structural features are compared, and a score is calculated based on the presenc
 ## Installation:
 
 1. Ensure you have PythoN is installed on your system.
-2. Install the required Python libraries:
+2. Before installing the required Pyhton libraries setup the virtual environment
     ```
-   pip install pymupdf nltk scikit-learn
+    python3 -m venv venv
     ```
-3. Download necessary NLTK data:
+    Now, we have to activate the virtual environment:
+   ```
+   source venv/bin/activate
+    ```
+   Now, if it needs the execute permissions to the activate script:
+   ```
+   chmod +x venv/bin/activate
+   ```
+4. Install the required Python libraries:
+    ```
+   pip3 install pymupdf nltk scikit-learn
+    ```
+5. Download necessary NLTK data:
    ```
    import ssl
    import nltk
